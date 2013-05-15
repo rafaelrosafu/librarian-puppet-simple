@@ -2,8 +2,9 @@ require 'fileutils'
 require 'rubygems/package'
 require 'zlib'
 require 'open-uri'
-require 'librarian/puppet/simple/util'
-require 'librarian/puppet/simple/iterator'
+require_relative 'util'
+require_relative 'iterator'
+require_relative 'providers'
 
 # This is an extremely simple file that can consume
 # a Puppet file with git references
@@ -14,9 +15,9 @@ module Librarian
   module Puppet
     module Simple
       module Installer
-
         include Librarian::Puppet::Simple::Util
         include Librarian::Puppet::Simple::Iterator
+        include Librarian::Puppet::Simple::ProviderSupport
 
         # installs modules using the each_module method from our
         # iterator mixin
@@ -24,6 +25,14 @@ module Librarian
           each_module do |repo|
 
             print_verbose "\n##### processing module #{repo[:name]}..."
+
+            begin
+              providers.fetch(repo.keys) do |provider|
+                provider.install repo
+              end
+            rescue ProviderNotFound
+              abort('only the following providers are currently supported: #{pro}')
+            end
 
             case
             when repo[:git]

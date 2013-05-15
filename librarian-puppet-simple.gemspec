@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "thor", "~> 0.15"
+  s.add_dependency "require_relative", "~> 1.0"
 
   s.add_development_dependency "rspec", "~> 2.13"
 end
